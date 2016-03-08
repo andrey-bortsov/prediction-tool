@@ -1,0 +1,709 @@
+<html>
+<head>
+    <title>Pain Prediction</title>
+	<style media="screen" type="text/css">
+	body {
+		margin-top: 0;
+		background-color: rgb(161,200,227);
+		font-family: verdana,arial,sans-serif;
+	}
+	h1 {
+		font-size: 150%;
+		margin: 0;
+		padding: .5em 0 .25em;
+	}
+	h2 {
+		font-size: 120%;
+		margin: 0;
+		padding: .25em 0 .5em;
+	}
+	h1, h2 {
+		color: rgb(205, 163, 94);
+	}
+	form {
+		margin: 0;
+		padding: 0;
+	}
+	select {
+		width: 140px;
+	}
+	#page {
+		width: 1000px;
+		margin: 0 auto;
+		background-color: white;
+		border: 1px solid rgb(119, 75, 77);
+	}
+	#header {
+		margin: 0;
+		border-bottom: 2px solid rgb(119, 75, 77);
+		padding: .5em 2em;
+	}
+	#header h1 {
+		margin: 0;
+		padding: .5em 0;
+		color: black;
+	}
+	#main {
+		margin: 0;
+		padding: .5em 2em 2em;
+	}
+	table.gridtable {
+		font-family: verdana,arial,sans-serif;
+		font-size:11px;
+		color:#333333;
+		border-width: 1px;
+		border-color: #666666; 
+			border-collapse: collapse;
+	}
+	table.gridtable th {
+		border-width: 1px;
+		padding: 8px;
+		border-style: solid;
+		border-color: #666666;
+		background-color: #dedede;
+	}
+	table.gridtable td {
+		border-width: 1px;
+		padding: 8px;
+		border-style: solid;
+		border-color: #666666;
+		background-color: #ffffff;
+	}
+	#right {
+	   float: right;
+	}
+	tr.d1 td {
+		background-color: #DDE6ED; color: black;}
+	</style>
+
+<script language="javascript">
+
+var beta = new Array();
+var maxDelta = new Array();
+var minDelta = new Array();
+
+function fmCheck() {
+	resetFunction();
+    if (document.getElementById('fCheck').checked) {
+        document.getElementById('Female').style.display = 'block';
+		document.getElementById('Note').style.display = 'block';
+		
+		beta =  Array(   
+			-5.212,
+			0.308,
+			0.186,
+			0.259,
+			-0.331,
+			0.555,
+			0.712,
+			0.258,
+			0.033,
+			0.174,
+			0.14,
+			-0.156
+			 );
+					
+		maxDelta =  Array(
+			0,
+			-1.486,
+			-0.068,
+			-0.068,
+			-1.363,
+			-1.032,
+			-1.032,
+			-1.032,
+			-1.032,
+			-1.560,
+			-1.560,
+			-1.560,
+			0
+			);
+					
+		minDelta =  Array(
+			0,
+			8.306,
+			6.179,
+			4.319,
+			4.060,
+			5.715,
+			5.160,
+			4.448,
+			3.416,
+			2.096,
+			1.400,
+			0.000,
+			0
+			 );
+		}
+    else document.getElementById('Female').style.display = 'none';
+	
+	if (document.getElementById('mCheck').checked) {
+        document.getElementById('Male').style.display = 'block';
+		document.getElementById('Note').style.display = 'block';
+		
+		beta =  Array(   
+			1.537,
+			0.2138,
+			0.1034,
+			0.3013,
+			0.233,
+			0.7865,
+			0.2153,
+			0.022,
+			1,
+			0.3012,
+			-0.3152,
+			0.2383
+			 );
+					
+		maxDelta =  Array(
+			0,
+			-8.907,
+			-7.923,
+			-7.923,
+			-8.224,
+			-8.224,
+			-8.224,
+			-8.224,
+			-8.576,
+			-1.576,
+			-1.576,
+			0.000,
+			0
+			);
+					
+		minDelta =  Array(
+			0,
+			6.399,
+			4.923,
+			3.889,
+			2.382,
+			1.450,
+			0.664,
+			-0.197,
+			-1.627,
+			3.273,
+			2.068,
+			2.383,
+			0
+			 );
+		}
+	else document.getElementById('Male').style.display = 'none';	
+	}
+
+function resetFunction()
+		{
+		document.getElementById("myFormF").reset();
+		document.getElementById("myFormM").reset();
+		document.getElementById("text1").innerHTML ="";
+		document.getElementById("text3").innerHTML ="";
+		document.getElementById("text4").innerHTML ="";
+
+		xValue = new Array();
+		xValue[0] = 1;
+		i = 0;
+		p1 = 0.5;
+		}
+
+var xValue = new Array();
+xValue[0] = 1;				
+var i = 0;
+var p1 = 0.5;
+
+function calculateFunction(NN) {
+	
+	if (document.getElementById('fCheck').checked) {
+		p1 = parseFloat(document.getElementById("p1").value,10);
+		var p = Math.log(p1/(1-p1)); 
+		}
+	else if (document.getElementById('mCheck').checked) {
+		p1 = parseFloat(document.getElementById("p2").value,10);
+		var p = Math.log(p1/(1-p1)); 
+		}
+
+	if (NN < 100){
+		if (NN == 1)
+			{
+			recDays = parseFloat(document.getElementById(NN).value,10);
+			xValue[NN] = Math.log(recDays + 0.01);}
+			
+		else if (NN == 8)
+			{var weight = parseFloat(document.getElementById(99).value,10); 
+			 var height = parseFloat(document.getElementById(8).value,10); 
+			 var BMI = 703*weight/(height*height);
+			 xValue[NN] = BMI;}
+			 
+		else {xValue[NN] = parseFloat(document.getElementById(NN).value,10);}
+		
+		i = NN;
+		
+		}
+	
+	else {
+			if (NN == 101)
+				{recDays = parseFloat(document.getElementById(NN).value,10);
+				xValue[NN-100] = Math.log(recDays + 0.01);}
+			
+			else if (NN == 108)
+				{var weight = parseFloat(document.getElementById(199).value,10); 
+				 var height = parseFloat(document.getElementById(108).value,10); 
+				 var BMI = 703*weight/(height*height);
+				xValue[NN-100] = 	-0.3063415*BMI 
+									+ 0.004032165*Number(BMI>19.90)*(Math.pow((BMI-19.90),3)) 
+									- 0.01281576*Number(BMI>25.72)*(Math.pow((BMI-25.72),3)) 
+									+ 0.01006131*Number(BMI>29.856)*(Math.pow((BMI-29.856),3)) 
+									- 0.001277716*Number(BMI>39.873)*(Math.pow((BMI-39.873),3)) 
+							;}
+			 
+			else {xValue[NN-100] = parseFloat(document.getElementById(NN).value,10);}
+			
+		i = NN-100;
+		}
+	
+	var sum = 0;
+		for(var j = 0; j < xValue.length; j++) {
+			sum += xValue[j]*beta[j];
+		}
+	var min = p - minDelta[i+1];
+	var max = p - maxDelta[i+1];	
+	
+	
+	if (sum < min)		{document.getElementById("text1").innerHTML = "Patient's risk is below threshold (SCREEN OUT)";}
+	else if (sum > max) {document.getElementById("text1").innerHTML = "Patient's risk is above threshold (SCREEN IN)";}			
+	else 				{document.getElementById("text1").innerHTML = "Proceed to next question";}
+
+	if (xValue.length == 12)
+		{var risk = Math.exp(sum)/(Math.exp(sum) + 1);
+		document.getElementById("text3").innerHTML = "Patient's risk of chronic pain is";
+		document.getElementById("text4").innerHTML = risk.toPrecision(2);
+		}
+		}
+</script>  
+
+</head>
+<body>
+    <div id="page">
+    <div id="header">
+       <div id="right">
+       </div>
+       <h1 align="center">UNC Calculator of the Risk of Chronic Axial Pain after MVC</h1>
+    </div>
+
+	<p align="center">
+	This online risk assessment tool can be used to evaluate the risk of persistent axial musculoskeletal pain after 
+	motor vehicle collision (MVC), and stratify post-MVC patients according to the specified risk threshold. 
+	The prediction model has been developed using a sample of approximately 900 adults who were evaluated in the ED within 
+	48 hours after MVC and discharged to home after evaluation. For research purposes only. 
+	<br><br>
+	Please select patient's sex:<br>
+	Female <input type="radio" onclick="javascript:fmCheck();" name="fm" id="fCheck" autocomplete='off'> Male <input type="radio" 
+	onclick="javascript:fmCheck();" name="fm" id="mCheck" autocomplete='off'><br>
+    </p>
+
+	<div id="Note" style="display:none">
+	<p	align="center">Please complete the questions <u>sequentially</u> starting from the first question. Proceed until the risk stratification 
+	decision is made, or complete all questions to obtain the risk value.</p>
+	</div>
+	
+<font color="red">
+<p align="center" id="text1"></p>
+<p align="center" id="text2"></p>
+<p align="center" id="text3"></p>
+<p align="center" id="text4"></p>
+
+
+
+<p align="center" id="demo2"></p>
+<p align="center" id="demo3"></p>
+<p align="center" id="demo4"></p>
+
+
+</font>
+
+	<div id="Female" style="display:none">
+    <div id="main">
+
+
+<form id='myFormF'>
+<table>
+    <tr><td>Specify the risk threshold for screening</td>  
+	<td> <input type="number" name="p1" value="0.5" id="p1" autocomplete='off'/></td><td></td></tr>
+    <tr><td></td></tr>
+	
+	<tr class="d1"><td>1. How long do you think it takes for a person to physically recover from the kind of accident you just had? (Days)</td>  
+	<td>
+	<select id="1" onchange="calculateFunction(1)" autocomplete='off'>
+    <option value="0" disabled="disabled" selected="selected">Please select</option>
+    <option value="0">0-1 day</option>
+	<option value="4.5">2-7 days</option>
+    <option value="11">8-14 days</option>
+    <option value="18">15-21 days</option>
+	<option value="30">1 month</option>
+	<option value="75">2-3 months</option>
+	<option value="150">4-6 months</option>
+	<option value="285">7-12 months</option>
+	<option value="550">More than 12 months</option>
+    </select></td><td></td></tr>
+	<tr><td></td></tr>
+    
+	<tr class="d1"><td>2. How much neck pain do you have right now? (0-10 scale)</td>  
+	<td>
+	<select id="2" onchange="calculateFunction(2)" autocomplete='off'>
+    <option value="0" disabled="disabled" selected="selected">Please select</option>
+    <option value="0">0</option>
+	<option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+	<option value="4">4</option>
+	<option value="5">5</option>
+	<option value="6">6</option>
+	<option value="7">7</option>
+	<option value="8">8</option>
+	<option value="9">9</option>
+	<option value="10">10</option>
+    </select></td><td></td></tr>
+	<tr><td></td></tr>
+	
+	<tr class="d1"><td><i>How did you feel during or after your motor vehicle accident?:</i></td><td></td><td></td></tr> 
+	<tr class="d1"><td>3. "I felt as if the events around the accident were happening to someone else"</td> 
+	<td>
+	<select id="3" onchange="calculateFunction(3)" autocomplete='off'>
+    <option value="0" disabled="disabled" selected="selected">Please select</option>
+    <option value="1">Strongly disagree</option>
+	<option value="2">Disagree</option>
+    <option value="3">Neutral</option>
+    <option value="4">Agree</option>
+	<option value="5">Strongly agree</option>
+    </select></td><td></td></tr>
+	<tr><td></td></tr>
+	
+	<tr class="d1"><td>4. "It was if I were watching myself"</td> 
+	<td> 
+	<select id="4" onchange="calculateFunction(4)" autocomplete='off'>
+    <option value="0" disabled="disabled" selected="selected">Please select</option>
+    <option value="1">Strongly disagree</option>
+	<option value="2">Disagree</option>
+    <option value="3">Neutral</option>
+    <option value="4">Agree</option>
+	<option value="5">Strongly agree</option>
+    </select></td><td></td></tr>
+	<tr><td></td></tr>
+	
+	<tr class="d1"><td>5. Have you ever had problems with back pain in the past?</td> 
+	<td>
+	<select id="5" onchange="calculateFunction(5)" autocomplete='off'>
+    <option value="0" disabled="disabled" selected="selected">Please select</option>
+    <option value="0">No</option>
+	<option value="1">Yes</option>
+    </select></td><td></td></tr>
+	<tr><td></td></tr>
+		
+	<tr class="d1"><td>6. Which statement best describes your feeling about the accident?</td> 
+	<td>
+	<select id="6" onchange="calculateFunction(6)" autocomplete='off'>
+    <option value="0" disabled="disabled" selected="selected">Please select</option>
+    <option value="0">My fault</option>
+	<option value="1">Another person's fault</option>
+	<option value="0">Nobody's fault</option>
+    </select></td><td></td></tr>
+	<tr><td></td></tr>
+	
+	<tr class="d1"><td>7. Do you have this thought or feeling when you are experiencing pain?: 
+	"There is nothing I can do to reduce the intensity of the pain"</td> 
+	<td>
+	<select id="7" onchange="calculateFunction(7)" autocomplete='off'>
+    <option value="0" disabled="disabled" selected="selected">Please select</option>
+    <option value="0">Not at all</option>
+	<option value="1">Slight degree</option>
+	<option value="2">Moderate degree</option>
+	<option value="3">Great degree</option>
+	<option value="4">All the time</option>
+    </select></td><td></td></tr>
+	<tr><td></td></tr>
+	
+    <tr class="d1"><td>8.1 Your weight in pounds</td>  
+	<td>
+	<select id="99" autocomplete='off'>
+    <option value="0" disabled="disabled" selected="selected">Please select</option>
+    <option value="90">Less than 100</option>
+	<option value="110">100-120</option>
+    <option value="130">121-140</option>
+    <option value="150">141-160</option>
+	<option value="170">161-180</option>
+	<option value="190">181-200</option>
+	<option value="210">201-220</option>
+	<option value="230">221-240</option>
+	<option value="250">241-260</option>
+	<option value="270">261-280</option>
+	<option value="290">281-300</option>
+	<option value="310">More than 300</option>
+    </select></td><td></td></tr>
+	<tr><td></td></tr>
+	
+	
+	<tr class="d1"><td>8.2 Your height in inches</td>  
+	<td>
+	<select id="8" onchange="calculateFunction(8)" autocomplete='off'>
+    <option value="0" disabled="disabled" selected="selected">Please select</option>
+    <option value="53">Less than 55</option>
+	<option value="57">55-60</option>
+    <option value="63">61-65</option>
+    <option value="68">66-70</option>
+	<option value="73">71-75</option>
+	<option value="78">76-80</option>
+	<option value="83">81-85</option>
+	<option value="88">More than 85</option>
+    </select></td><td></td></tr>
+	<tr><td></td></tr>
+	
+
+	<tr class="d1"><td>9. Are you agree with the following statement?: "I'm always optimistic about my future"</td> 
+	<td>
+	<select id="9" onchange="calculateFunction(9)" autocomplete='off'>
+    <option value="0" disabled="disabled" selected="selected">Please select</option>
+    <option value="0">Strongly disagree</option>
+	<option value="1">Disagree</option>
+    <option value="2">Neutral</option>
+    <option value="3">Agree</option>
+	<option value="4">Strongly agree</option>
+    </select></td><td></td></tr>
+	<tr><td></td></tr>
+	
+	<tr class="d1"><td>10. What is the intensity of your pain right now, considering any or all of your pains together? (0-10 scale)</td>  
+	<td>
+	<select id="10" onchange="calculateFunction(10)" autocomplete='off'>
+    <option value="0" disabled="disabled" selected="selected">Please select</option>
+    <option value="0">0</option>
+	<option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+	<option value="4">4</option>
+	<option value="5">5</option>
+	<option value="6">6</option>
+	<option value="7">7</option>
+	<option value="8">8</option>
+	<option value="9">9</option>
+	<option value="10">10</option>
+    </select></td><td></td></tr>
+	<tr><td></td></tr>
+	
+	<tr class="d1"><td>11. Pain or tenderness in the head during the past month (0-10 scale)</td>  
+	<td>
+	<select id="11" onchange="calculateFunction(11)" autocomplete='off'>
+    <option value="0" disabled="disabled" selected="selected">Please select</option>
+    <option value="0">0</option>
+	<option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+	<option value="4">4</option>
+	<option value="5">5</option>
+	<option value="6">6</option>
+	<option value="7">7</option>
+	<option value="8">8</option>
+	<option value="9">9</option>
+	<option value="10">10</option>
+    </select></td><td></td></tr>
+	<tr><td></td></tr>
+ 
+</table>
+</form>
+
+<button onclick="resetFunction()">Clear all</button>
+
+</div>
+<p align="center"><a href="http://www.med.unc.edu/anesthesiology/research/tryumph-research-group/" >TRYUMPH Research Group</a></p>
+</div>
+
+<div id="Male" style="display:none">    
+       
+<div id="main">
+
+<form id='myFormM'>
+<table>
+    <tr><td>Specify the risk threshold for screening</td>  
+	<td> <input type="number" name="p2" value="0.5" id="p2" autocomplete='off'/></td><td></td></tr>
+    <tr><td></td></tr>
+	
+	<tr class="d1"><td>1. How long do you think it takes for a person to physically recover from the kind of accident you just had? (Days)</td>  
+	<td>
+	<select id="101" onchange="calculateFunction(101)" autocomplete='off'>
+    <option value="0" disabled="disabled" selected="selected">Please select</option>
+    <option value="0">0-1 day</option>
+	<option value="4.5">2-7 days</option>
+    <option value="11">8-14 days</option>
+    <option value="18">15-21 days</option>
+	<option value="30">1 month</option>
+	<option value="75">2-3 months</option>
+	<option value="150">4-6 months</option>
+	<option value="285">7-12 months</option>
+	<option value="550">More than 12 months</option>
+    </select></td><td></td></tr>
+	<tr><td></td></tr>
+    
+	<tr class="d1"><td>2. How much low back pain do you have right now? (0-10 scale)</td>  
+	<td>
+	<select id="102" onchange="calculateFunction(102)" autocomplete='off'>
+    <option value="0" disabled="disabled" selected="selected">Please select</option>
+    <option value="0">0</option>
+	<option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+	<option value="4">4</option>
+	<option value="5">5</option>
+	<option value="6">6</option>
+	<option value="7">7</option>
+	<option value="8">8</option>
+	<option value="9">9</option>
+	<option value="10">10</option>
+    </select></td><td></td></tr>
+	<tr><td></td></tr>
+	
+	<tr class="d1"><td><i>How did you feel during or after your motor vehicle accident?:</i></td><td></td><td></td></tr> 
+
+	<tr class="d1"><td>3. "It was if I were watching myself"</td> 
+	<td> 
+	<select id="103" onchange="calculateFunction(103)" autocomplete='off'>
+    <option value="0" disabled="disabled" selected="selected">Please select</option>
+    <option value="1">Strongly disagree</option>
+	<option value="2">Disagree</option>
+    <option value="3">Neutral</option>
+    <option value="4">Agree</option>
+	<option value="5">Strongly agree</option>
+    </select></td><td></td></tr>
+	<tr><td></td></tr>
+	
+	<tr class="d1"><td>4. "I had the feeling I was about to lose control of my emotions"</td> 
+	<td>
+	<select id="104" onchange="calculateFunction(104)" autocomplete='off'>
+    <option value="0" disabled="disabled" selected="selected">Please select</option>
+    <option value="0">Not true</option>
+	<option value="1">Slightly true</option>
+    <option value="2">Somewhat true</option>
+    <option value="3">Very true</option>
+	<option value="4">Extremely true</option>
+    </select></td><td></td></tr>
+	<tr><td></td></tr>
+	
+	<tr class="d1"><td>5. Which statement best describes your feeling about the accident?</td> 
+	<td>
+	<select id="105" onchange="calculateFunction(105)" autocomplete='off'>
+    <option value="0" disabled="disabled" selected="selected">Please select</option>
+    <option value="0">My fault</option>
+	<option value="1">Another person's fault</option>
+	<option value="0">Nobody's fault</option>
+    </select></td><td></td></tr>
+	<tr><td></td></tr>
+	
+	<tr class="d1"><td>6. Do you have this thought or feeling when you are experiencing pain?: 
+	"There is nothing I can do to reduce the intensity of the pain"</td> 
+	<td>
+	<select id="106" onchange="calculateFunction(106)" autocomplete='off'>
+    <option value="0" disabled="disabled" selected="selected">Please select</option>
+    <option value="0">Not at all</option>
+	<option value="1">Slight degree</option>
+	<option value="2">Moderate degree</option>
+	<option value="3">Great degree</option>
+	<option value="4">All the time</option>
+    </select></td><td></td></tr>
+	<tr><td></td></tr>
+	
+	<tr class="d1"><td>7. Your age in years</td>  
+	<td>
+	<select id="107" onchange="calculateFunction(107)" autocomplete='off'>
+    <option value="0" disabled="disabled" selected="selected">Please select</option>
+    <option value="22">18-25</option>
+	<option value="30">26-35</option>
+    <option value="40">36-45</option>
+    <option value="50">46-55</option>
+	<option value="60">56-65</option>
+    </select></td><td></td></tr>
+	<tr><td></td></tr>
+    
+	<tr class="d1"><td>8.1 Your weight in pounds</td>  
+	<td>
+	<select id="199" autocomplete='off'>
+    <option value="0" disabled="disabled" selected="selected">Please select</option>
+    <option value="90">Less than 100</option>
+	<option value="110">100-120</option>
+    <option value="130">121-140</option>
+    <option value="150">141-160</option>
+	<option value="170">161-180</option>
+	<option value="190">181-200</option>
+	<option value="210">201-220</option>
+	<option value="230">221-240</option>
+	<option value="250">241-260</option>
+	<option value="270">261-280</option>
+	<option value="290">281-300</option>
+	<option value="310">More than 300</option>
+    </select></td><td></td></tr>
+	<tr><td></td></tr>
+	
+	<tr class="d1"><td>8.2 Your height in inches</td>  
+	<td>
+	<select id="108" onchange="calculateFunction(108)" autocomplete='off'>
+    <option value="0" disabled="disabled" selected="selected">Please select</option>
+    <option value="53">Less than 55</option>
+	<option value="57">55-60</option>
+    <option value="63">61-65</option>
+    <option value="68">66-70</option>
+	<option value="73">71-75</option>
+	<option value="78">76-80</option>
+	<option value="83">81-85</option>
+	<option value="88">More than 85</option>
+    </select></td><td></td></tr>
+	<tr><td></td></tr>
+		
+	<tr class="d1"><td>9. Are you agree with the following statement?: "I'm always optimistic about my future"</td> 
+	<td>
+	<select id="109" onchange="calculateFunction(109)" autocomplete='off'>
+    <option value="0" disabled="disabled" selected="selected">Please select</option>
+    <option value="0">Strongly disagree</option>
+	<option value="1">Disagree</option>
+    <option value="2">Neutral</option>
+    <option value="3">Agree</option>
+	<option value="4">Strongly agree</option>
+    </select></td><td></td></tr>
+	<tr><td></td></tr>
+	
+	<tr class="d1"><td>10. During the past four weeks, how much of the time have you felt the following 
+	problem with your work or other regular daily activities as a result of your physical health?: 
+	"Accomplished less than you would like"</td> 
+	<td>
+	<select id="110" onchange="calculateFunction(110)" autocomplete='off'>
+    <option value="0" disabled="disabled" selected="selected">Please select</option>
+    <option value="1">All the time</option>
+	<option value="2">Most of time</option>
+    <option value="3">Some of time</option>
+    <option value="4">Little of time</option>
+	<option value="5">None of time</option>
+    </select></td><td></td></tr>
+	<tr><td></td></tr>
+	
+	<tr class="d1"><td>11. What is the intensity of your pain right now, considering any or all of your pains together? (0-10 scale)</td>  
+	<td>
+	<select id="111" onchange="calculateFunction(111)" autocomplete='off'>
+    <option value="0" disabled="disabled" selected="selected">Please select</option>
+    <option value="0">0</option>
+	<option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+	<option value="4">4</option>
+	<option value="5">5</option>
+	<option value="6">6</option>
+	<option value="7">7</option>
+	<option value="8">8</option>
+	<option value="9">9</option>
+	<option value="10">10</option>
+    </select></td><td></td></tr>
+	<tr><td></td></tr>
+    
+</table>
+</form>
+
+<button onclick="resetFunction()">Clear all</button>
+</div>
+<p align="center"><a href="http://www.med.unc.edu/anesthesiology/research/tryumph-research-group/" >TRYUMPH Research Group</a></p>
+</div>
+</body>
+</html>
+
